@@ -1,2 +1,2 @@
 # BJO
-This is an auto push repository for Baekjoon Online Judge created with [AlgoPlus](https://github.com/algo-plus/algo-plus).
+해당 저장소는 매일 풀이하는 알고리즘문제들의 간단한 리뷰와 메모를 저장하는 용도입니다
