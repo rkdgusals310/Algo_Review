@@ -28,3 +28,161 @@
 
  <p>출력은 표준 출력을 사용한다. 만일 입력 괄호 문자열이 올바른 괄호 문자열(VPS)이면 “YES”, 아니면 “NO”를 한 줄에 하나씩 차례대로 출력해야 한다. </p>
 
+
+#  🚀  오답 코드 
+
+```diff
+/*
+    괄호 ( )로만 구성되어 있는 문자열 
+    올바른 괄호  문자열  VPS라고 함
+    한쌍의 괄호 기호로 된 () 문자열은 기본 VPS
+    
+*/
+//(())())
+import java.util.*;
+
+public class Main{
+    public static void main(String args[]){
+        Stack<Character> stack=new Stack<>();
+        Scanner s=new Scanner(System.in);
+        StringBuilder sb=new StringBuilder();
+        String answer="YES";
+        
+        int n=s.nextInt();
+        boolean breakN=false;
+        for(int i=0;i<n;i++){
+            String str=s.next();
+            for(int j=0;j<str.length();j++){
+                char c=str.charAt(j);
+                if(stack.isEmpty()&&c=='('){
+                    stack.push(c);
+                }
+                else{
+                    if(stack.peek()=='('&&c==')')stack.pop();
+                    else if(stack.peek()=='('&&c=='(')stack.push(c);
+                    else {
+                        breakN=true;
+                        break;
+                    }
+                }
+            }
+            if(breakN)answer="NO";
+            else answer="YES";
+            sb.append(answer).append("\n");
+        }
+        System.out.print(sb);
+    }
+}
+```
+해당 코드는 최소의 작성한 코드로 Stack를 사용해야한다는 부분을 파악하고 문자열을 처음부터 차례대로 비교해 조건에 맞게 stack에 push하거나 pop하는 방식으로 작성하였다.  
+조건은 아래와 같이 크게 2가지로 나누어진다.
+
+1. stack이 비어있는 경우
+2. stack이 비어있지 않은 경우
+
+비어있는 경우에는 비교하는 문자가 '('인 경우에만 push해주고 아닌 경우는 NO로 판단한다.    
+이유는 () 쌍으로 구성되어 있는 문자열을 충족하려면 시작은 무조건 '('인 경우만 쌍 판단이 가능하기 때문이다.    
+
+비어있지 않은 경우에는 3가지 경우를 비교해야한다.    
+먼저  stack의 마자믹 요소가 '('인지를 비교한다. '('인경우 비교 문자가 '('면 push , ')'이면 쌍이 맞는 경우이므로 pop해준다.  
+stack의 마지막 요소가 ')'인 경우는 존재하지 않는다. 왜냐하면 stack에 push를 하는경우는 문자가 '('인 경우만이고      
+')'인 경우에는 쌍이 만족했다고 판단해 pop해주기 때문에 stack의 마지막 요소는 ')'이 될 수가 없다.    
+하지만 반복문을 미리 종료 시킬 수 있기때문에 breakN과 함께 break문도 작성하였다.    
+
+```java
+ else {
+    breakN=true;
+    break;
+}
+```
+
+해당 코드가 없어도 코드는 정상 동작한다.   
+이후 코드에서 breakN이 true이면 NO를 아니면 YES를 출력하는 식으로 작성하였다.  
+
+해당 코드에는 2가지 문제점이 존재하는데   
+1. 문자 비교가 끝나고 stack이 비어있지 않은 경우를 고려하지 않는다.  
+   VPS는 () 쌍이 모두 이러어져있는 문자열인데 "()()(((" 이런식으로 쌍이 맞지 않지만 정상적으로 반복을 끝내는 경우가 존재한다.  
+   이 경우 stack에는 (((이 남아있지만 위의 코드에서는 고려하지 않았기 때문에 YES가 나올 것이다.  
+2. 1번 경우보다 더 심각한 문제는 stack을 초기화 시켜주지 않는데 있다.  
+   n만큼의 문자열을 입력받고 각각 비교해서 출력하는데 처음 반복을 끝냈을때 stack이 비어있지 않다면 stack의 값이 누적되어  
+   설계한 것과는 다르게 출력될 가능성이 높아진다.  
+
+# 💻 코드 리뷰
+
+
+
+
+ ## 🏆 메모 
+
+처음 문제를 보고 Stack를 사용해야하는가?에 대한 부분은 바로 느낌이 오지는 않았다.  
+하지만 문제를 분석하면서 결국 () 쌍이 맞으려면 가장 먼저들어온 ( 괄호가 가장 늦게까지 존재해야 쌍비교가 가능하다는 것을 파악해 문제를 해결할 수 있었다.
+
+#  🚀  추가 코드 
+
+```diff
+import java.util.*;
+
+public class Main{
+    public static int map[][];
+    public static void main(String args[]){
+        Scanner s=new Scanner(System.in);
+        
+        int n=s.nextInt();
+        int m=s.nextInt();
+        map=new int[n][m];
+
+        for(int i=0;i<n;i++){
+            String str=s.next();
+            for(int j=0;j<m;j++){
+                map[i][j]=str.charAt(j)-'0';
+            }
+            
+        }
+        bfs(0,0);
+        System.out.print(map[n-1][m-1]);
+    }
+    
+    public static void bfs(int x,int y){
+        Queue<int[]> queue=new LinkedList<>();
+        queue.add(new int[]{x,y});
+        int dx[]={-1,1,0,0};
+        int dy[]={0,0,-1,1};
+        
+        while(!queue.isEmpty()){
+            int num[]=queue.poll();
+            
+            
+            for(int i=0;i<4;i++){
+                int nx=num[0]+dx[i];
+                int ny=num[1]+dy[i];
+                if(nx>=0&&ny>=0&&nx<map.length&&ny<map[0].length){
+                    if(map[nx][ny]==1){
+                        map[nx][ny]=map[num[0]][num[1]]+1;
+                        queue.add(new int[]{nx,ny});
+                    }
+                }
+            }
+            
+            
+        }
+    }
+}
+```
+
+# 💻 코드 리뷰
+추가 코드는 visited 함수 없이 탐색하는 방식으로 
+```
+ if(map[nx][ny]==1){
+		map[nx][ny]=map[num[0]][num[1]]+1;
+		queue.add(new int[]{nx,ny});
+}
+```
+본 코드를 통해 방문처리와 카운트를 동시에 한다고 볼 수 있다.  
+처음 코드에서는 큐에 x,y값을 제외하고 이동할때 카운트하는 cnt를 넘겨주어 칸 이동을 계산해주었다.   
+하지만 해당 코드에서는 미로에서 이동하면서 1이 아니면 이동할 수 없기때문에   
+이를 활용하여 값을 이동할때마다 이전값을 더해주는 방식으로 방문처리를 표시해주는것이다. 
+예를 들어 (1,1)이 1이고 (1,2)가 1이라면 (1,1)에서 (1,2)로 이동 후 (1,2)=2로 표시해 방문한적이 있다라는 것을 표시하는 것이다.
+하지만 이런방식은 BFS가 시작점으로 돌아올 확률이 적긴하지만 시작지점은 별도의 방문처리를 해주지 않기 때문에 문제가 될 수도 있겠다는 생각을 했다.  
+
+
+
